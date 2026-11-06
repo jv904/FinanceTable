@@ -44,7 +44,11 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'inicio' },
       comingSoon('inicio', 'Início', 'Aqui você verá seu saldo, gráficos, últimas movimentações e metas.'),
       comingSoon('movimentacoes', 'Movimentações', 'Aqui você vai registrar e consultar suas receitas e despesas.'),
-      comingSoon('categorias', 'Categorias', 'Aqui você vai organizar as categorias de receitas e despesas.'),
+      {
+        path: 'categorias',
+        title: 'Categorias · FinanceTable',
+        loadComponent: () => import('./features/categories/categories').then((m) => m.Categories),
+      },
       comingSoon('metas', 'Metas', 'Aqui você vai planejar seus objetivos e acompanhar o progresso.'),
       comingSoon('relatorios', 'Relatórios', 'Aqui você vai analisar suas finanças por período e comparar meses.'),
       {

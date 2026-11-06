@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	private static final String REQUIRED_FIELDS_MESSAGE = "Preencha todos os campos obrigatórios.";
+	private static final String UNREADABLE_MESSAGE = "Não foi possível ler os dados enviados.";
 
 	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
@@ -64,8 +66,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-		ProblemDetail body = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
-				"Não foi possível ler os dados enviados.");
+		ProblemDetail body = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, UNREADABLE_MESSAGE);
+		return handleExceptionInternal(ex, body, headers, HttpStatus.BAD_REQUEST, request);
+	}
+
+	/** Por exemplo, um id que não é UUID no endereço. Sem isto, a resposta traz o texto em inglês do Spring. */
+	@Override
+	protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers,
+			HttpStatusCode status, WebRequest request) {
+		ProblemDetail body = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, UNREADABLE_MESSAGE);
 		return handleExceptionInternal(ex, body, headers, HttpStatus.BAD_REQUEST, request);
 	}
 

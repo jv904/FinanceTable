@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.com.financeTable.backend.auth.dto.RegisterRequest;
+import com.com.financeTable.backend.category.CategoryService;
 import com.com.financeTable.backend.common.ApiException;
 import com.com.financeTable.backend.user.User;
 import com.com.financeTable.backend.user.UserRepository;
@@ -21,10 +22,12 @@ public class AuthService {
 
 	private final UserRepository users;
 	private final PasswordEncoder passwordEncoder;
+	private final CategoryService categories;
 
-	AuthService(UserRepository users, PasswordEncoder passwordEncoder) {
+	AuthService(UserRepository users, PasswordEncoder passwordEncoder, CategoryService categories) {
 		this.users = users;
 		this.passwordEncoder = passwordEncoder;
+		this.categories = categories;
 	}
 
 	@Transactional
@@ -35,13 +38,15 @@ public class AuthService {
 		if (users.existsByEmail(email)) {
 			throw new ApiException(HttpStatus.CONFLICT, EMAIL_TAKEN);
 		}
+		User user;
 		try {
-			users.saveAndFlush(new User(request.name().trim(), email, passwordEncoder.encode(request.password())));
+			user = users.saveAndFlush(new User(request.name().trim(), email, passwordEncoder.encode(request.password())));
 		}
 		catch (DataIntegrityViolationException ex) {
 			// Dois cadastros simultâneos com o mesmo e-mail: a restrição do banco decide.
 			throw new ApiException(HttpStatus.CONFLICT, EMAIL_TAKEN);
 		}
+		categories.createDefaults(user.getId());
 	}
 
 	@Transactional(readOnly = true)

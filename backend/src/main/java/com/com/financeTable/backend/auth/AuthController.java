@@ -33,6 +33,9 @@ class AuthController {
 
 	private final AuthenticationManager authenticationManager;
 	private final SecurityContextRepository contextRepository;
+	// O cookie CSRF precisa ser legível: o Angular lê o valor e o devolve no cabeçalho X-XSRF-TOKEN.
+	// Quem protege a sessão é o cookie SESSION, que é HttpOnly.
+	@SuppressWarnings("java:S3330")
 	private final CsrfTokenRepository csrfTokens = CookieCsrfTokenRepository.withHttpOnlyFalse();
 	private final AuthService authService;
 	private final PasswordResetService resetService;
