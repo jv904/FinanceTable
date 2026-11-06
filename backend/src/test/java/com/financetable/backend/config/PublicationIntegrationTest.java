@@ -1,5 +1,6 @@
 package com.financetable.backend.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -8,11 +9,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Properties;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,6 +33,19 @@ class PublicationIntegrationTest {
 
 	@Autowired
 	private MockMvc mvc;
+
+	@Autowired
+	private JavaMailSender mailSender;
+
+	/** Se a configuração não chegar ao envio, nada falha: o e-mail só fica sem tempo limite. */
+	@Test
+	void mailTimeoutsReachTheSender() {
+		Properties properties = ((JavaMailSenderImpl) mailSender).getJavaMailProperties();
+
+		assertThat(properties.getProperty("mail.smtp.connectiontimeout")).isEqualTo("5000");
+		assertThat(properties.getProperty("mail.smtp.timeout")).isEqualTo("10000");
+		assertThat(properties.getProperty("mail.smtp.writetimeout")).isEqualTo("10000");
+	}
 
 	@Test
 	void reloadingAnAngularRouteDeliversTheApplication() throws Exception {
