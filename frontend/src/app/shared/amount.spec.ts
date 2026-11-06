@@ -1,4 +1,19 @@
-import { amountProblem, formatAmount, parseAmount } from './amount';
+import { amountProblem, formatAmount, optionalAmountProblem, parseAmount } from './amount';
+
+describe('optionalAmountProblem', () => {
+  it('aceita vazio, zero e valores válidos', () => {
+    expect(optionalAmountProblem('')).toBeNull();
+    expect(optionalAmountProblem('   ')).toBeNull();
+    expect(optionalAmountProblem('0')).toBeNull();
+    expect(optionalAmountProblem('1.250,50')).toBeNull();
+  });
+
+  it('recusa texto inválido e valor acima do limite', () => {
+    expect(optionalAmountProblem('abc')).toBe('Informe um valor válido, como 1.250,50.');
+    expect(optionalAmountProblem('-5')).toBe('Informe um valor válido, como 1.250,50.');
+    expect(optionalAmountProblem('1.000.000.000.000,00')).toBe('O valor é maior do que o permitido.');
+  });
+});
 
 describe('parseAmount', () => {
   it.each([

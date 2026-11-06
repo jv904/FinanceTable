@@ -34,6 +34,18 @@ export function amountProblem(text: string): string | null {
   return amount > MAX_AMOUNT ? 'O valor é maior do que o permitido.' : null;
 }
 
+/** Para campos em que vazio e zero são válidos, como o valor já guardado de uma meta. */
+export function optionalAmountProblem(text: string): string | null {
+  if (!text.trim()) {
+    return null;
+  }
+  const amount = parseAmount(text);
+  if (amount === null) {
+    return 'Informe um valor válido, como 1.250,50.';
+  }
+  return amount > MAX_AMOUNT ? 'O valor é maior do que o permitido.' : null;
+}
+
 /** Formata para o campo de edição, sem o símbolo da moeda: 1250.5 vira "1.250,50". */
 export function formatAmount(amount: number): string {
   return amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

@@ -2,7 +2,7 @@
 
 Plataforma de controle financeiro pessoal: receitas, despesas, categorias, metas e relatórios.
 
-**Situação atual:** Etapas 1 a 5 concluídas (estrutura, identidade visual, navegação, cadastro, login, logout, recuperação de senha, categorias, receitas, despesas e resumo financeiro). As áreas de metas e relatórios ainda aparecem como "em breve".
+**Situação atual:** Etapas 1 a 6 concluídas (estrutura, identidade visual, navegação, cadastro, login, logout, recuperação de senha, categorias, receitas, despesas, resumo financeiro e metas). A área de relatórios ainda aparece como "em breve".
 
 O que a plataforma deve fazer e as etapas de desenvolvimento estão no [manual](docs/manual.md).
 

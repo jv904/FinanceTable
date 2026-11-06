@@ -10,6 +10,8 @@ import { catchError, EMPTY, Subject, switchMap } from 'rxjs';
 import { apiErrorMessage } from '../../core/http/api-error';
 import { NotificationService } from '../../core/notifications/notification.service';
 import { CategoryService, CategoryType } from '../categories/category.service';
+import { GoalProgress } from '../goals/goal-progress';
+import { Goal, GoalService } from '../goals/goal.service';
 import {
   TRANSACTION_DIALOG_SIZE,
   TransactionFormData,
@@ -30,6 +32,7 @@ import { Summary, SummaryService } from './summary.service';
     CurrencyPipe,
     DatePipe,
     ExpenseTrend,
+    GoalProgress,
     MatButtonModule,
     MatIconModule,
     RouterLink,
@@ -138,6 +141,35 @@ import { Summary, SummaryService } from './summary.service';
           </section>
         </div>
       </div>
+
+      <section class="panel goals">
+        <header class="section-title">
+          <h2>Metas em andamento</h2>
+          <a routerLink="/metas">Ver todas</a>
+        </header>
+        @if (goalsError()) {
+          <p class="ft-form-alert" role="alert">{{ goalsError() }}</p>
+          <button matButton="outlined" type="button" (click)="loadGoals()">Tentar novamente</button>
+        } @else if (activeGoals().length) {
+          <ul class="goal-list">
+            @for (goal of activeGoals(); track goal.id) {
+              <li>
+                <div class="goal-line">
+                  <span class="description">{{ goal.name }}</span>
+                  <span class="goal-percent">{{ goal.progressPercent }}%</span>
+                </div>
+                <app-goal-progress [percent]="goal.progressPercent" [name]="goal.name" />
+                <div class="goal-line meta">
+                  <span>Guardado: {{ goal.savedAmount | currency: 'BRL' }}</span>
+                  <span>Falta: {{ goal.remainingAmount | currency: 'BRL' }}</span>
+                </div>
+              </li>
+            }
+          </ul>
+        } @else if (goalsLoaded()) {
+          <p class="message">Nenhuma meta em andamento.</p>
+        }
+      </section>
     }
   `,
   styles: `
@@ -323,6 +355,38 @@ import { Summary, SummaryService } from './summary.service';
       color: var(--ft-expense);
     }
 
+    .goals {
+      margin-top: 16px;
+    }
+
+    .goal-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .goal-list li {
+      padding: 12px 0;
+      border-top: 1px solid var(--ft-border);
+    }
+
+    .goal-line {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2px 12px;
+      margin: 4px 0;
+    }
+
+    /* Base zero: um nome longo quebra dentro da própria coluna, sem empurrar a porcentagem para outra linha. */
+    .goal-line .description {
+      flex: 1 1 0;
+    }
+
+    .goal-percent {
+      font-weight: 600;
+    }
+
     .message {
       margin: 0;
       color: var(--ft-text-muted);
@@ -336,6 +400,7 @@ import { Summary, SummaryService } from './summary.service';
 export class Home implements OnInit {
   private readonly service = inject(SummaryService);
   private readonly categories = inject(CategoryService);
+  private readonly goalService = inject(GoalService);
   private readonly dialog = inject(MatDialog);
   private readonly notifications = inject(NotificationService);
   private readonly reload$ = new Subject<void>();
@@ -346,6 +411,15 @@ export class Home implements OnInit {
   protected readonly loadError = signal('');
   protected readonly title = computed(() => monthTitle(this.month()));
   protected readonly isCurrentMonth = computed(() => this.month() === currentMonth());
+
+  private readonly goals = signal<Goal[]>([]);
+  protected readonly goalsLoaded = signal(false);
+  protected readonly goalsError = signal('');
+  protected readonly activeGoals = computed(() =>
+    this.goals()
+      .filter((goal) => goal.remainingAmount > 0)
+      .slice(0, 3),
+  );
 
   constructor() {
     // switchMap cancela a consulta anterior: trocar de mês rápido nunca mostra o mês errado.
@@ -372,6 +446,19 @@ export class Home implements OnInit {
 
   ngOnInit(): void {
     this.reload();
+    this.loadGoals();
+  }
+
+  /** Carga separada do resumo: se as metas falharem, só este bloco mostra o erro. */
+  protected loadGoals(): void {
+    this.goalsError.set('');
+    this.goalService.list().subscribe({
+      next: (goals) => {
+        this.goals.set(goals);
+        this.goalsLoaded.set(true);
+      },
+      error: (error: unknown) => this.goalsError.set(apiErrorMessage(error)),
+    });
   }
 
   protected reload(): void {

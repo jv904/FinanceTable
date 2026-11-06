@@ -57,7 +57,11 @@ export const routes: Routes = [
         title: 'Categorias · FinanceTable',
         loadComponent: () => import('./features/categories/categories').then((m) => m.Categories),
       },
-      comingSoon('metas', 'Metas', 'Aqui você vai planejar seus objetivos e acompanhar o progresso.'),
+      {
+        path: 'metas',
+        title: 'Metas · FinanceTable',
+        loadComponent: () => import('./features/goals/goals').then((m) => m.Goals),
+      },
       comingSoon('relatorios', 'Relatórios', 'Aqui você vai analisar suas finanças por período e comparar meses.'),
       {
         path: 'perfil',

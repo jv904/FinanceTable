@@ -68,6 +68,7 @@ describe('Home', () => {
     fixture = TestBed.createComponent(Home);
     element = fixture.nativeElement;
     await fixture.whenStable();
+    http.expectOne('/api/goals').flush([]);
   });
 
   afterEach(() => {
@@ -195,6 +196,62 @@ describe('Home', () => {
     expect(text()).toContain('Nenhuma despesa neste mês.');
     expect(text()).toContain('Nenhuma despesa nos últimos 6 meses.');
     expect(text()).toContain('Nenhuma movimentação encontrada.');
+  });
+
+  describe('bloco de metas', () => {
+    const goal = (id: string, remainingAmount: number, progressPercent: number) => ({
+      id,
+      name: `Meta ${id}`,
+      targetAmount: 5000,
+      savedAmount: 5000 - remainingAmount,
+      remainingAmount,
+      progressPercent,
+      targetDate: '2027-06-30',
+    });
+
+    async function loadGoals(goals: unknown[]): Promise<void> {
+      fixture.componentInstance['loadGoals']();
+      http.expectOne('/api/goals').flush(goals);
+      await fixture.whenStable();
+    }
+
+    it('mostra guardado, quanto falta e progresso, só das metas em andamento e no máximo 3', async () => {
+      await respond();
+      await loadGoals([goal('1', 3000, 40), goal('alcançada', 0, 100), goal('2', 1000, 80), goal('3', 500, 90), goal('4', 100, 98)]);
+
+      expect(text()).toContain('Meta 1');
+      expect(text()).toMatch(/Guardado: R\$\s2\.000,00/);
+      expect(text()).toMatch(/Falta: R\$\s3\.000,00/);
+      expect(text()).toContain('40%');
+      expect(text()).toContain('Meta 3');
+      expect(text()).not.toContain('Meta 4');
+      expect(text()).not.toContain('Meta alcançada');
+      expect(element.querySelector('a[href="/metas"]')).not.toBeNull();
+    });
+
+    it('sem metas em andamento, avisa', async () => {
+      await respond();
+      await fixture.whenStable();
+
+      expect(text()).toContain('Nenhuma meta em andamento.');
+    });
+
+    it('se as metas falharem, só o bloco mostra o erro e pode tentar de novo', async () => {
+      await respond();
+      fixture.componentInstance['loadGoals']();
+      http.expectOne('/api/goals').flush({ detail: 'Sem metas.' }, { status: 500, statusText: 'Error' });
+      await fixture.whenStable();
+
+      expect(text()).toContain('Sem metas.');
+      expect(text()).toMatch(/Saldo atual\s*R\$\s1\.500,00/);
+
+      element.querySelector<HTMLButtonElement>('.goals button')!.click();
+      http.expectOne('/api/goals').flush([goal('1', 3000, 40)]);
+      await fixture.whenStable();
+
+      expect(text()).not.toContain('Sem metas.');
+      expect(text()).toContain('Meta 1');
+    });
   });
 
   it('cadastrar pelo início abre o formulário com categorias novas e recarrega o resumo', async () => {
