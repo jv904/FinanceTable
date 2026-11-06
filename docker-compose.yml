@@ -1,0 +1,31 @@
+# Serviços de desenvolvimento do FinanceTable.
+# As portas ficam disponíveis apenas nesta máquina (127.0.0.1).
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: financetable-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-financetable}
+      POSTGRES_USER: ${DB_USERNAME:-financetable}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-financetable}
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-financetable} -d ${DB_NAME:-financetable}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Caixa de e-mails de teste: nada é enviado de verdade.
+  # Mensagens em http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.27
+    container_name: financetable-mailpit
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+
+volumes:
+  postgres-data:

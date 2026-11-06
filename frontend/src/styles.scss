@@ -1,0 +1,84 @@
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light;
+
+  @include mat.theme((
+    color: (
+      primary: mat.$cyan-palette,
+      tertiary: mat.$azure-palette,
+    ),
+    typography: Inter,
+    density: 0,
+  ));
+
+  // Identidade do FinanceTable. Receita e despesa ficam prontas para as próximas etapas.
+  --ft-income: #1b7f4b;
+  --ft-expense: #c0362c;
+  --ft-brand: #00696d;
+  --ft-brand-soft: #d9eeee;
+  --ft-surface-muted: #f3f7f7;
+  --ft-border: #dce4e4;
+  --ft-text-muted: #51605f;
+  --ft-error-surface: #fdecea;
+  --ft-error-text: #8c1d18;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ft-surface-muted);
+  color: var(--mat-sys-on-surface);
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+// Formulários de acesso e cadastro
+.ft-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  button[type='submit'] {
+    margin-top: 8px;
+    height: 48px;
+  }
+}
+
+.ft-form-alert {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--ft-error-surface);
+  color: var(--ft-error-text);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.ft-form-links {
+  margin: 20px 0 0;
+  color: var(--ft-text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+
+  a {
+    color: var(--ft-brand);
+    font-weight: 600;
+  }
+}
+
+.ft-forgot-link {
+  align-self: flex-end;
+  margin: -8px 0 8px;
+  color: var(--ft-brand);
+  font-size: 14px;
+  font-weight: 500;
+}
