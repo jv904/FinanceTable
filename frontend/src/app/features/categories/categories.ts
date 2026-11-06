@@ -5,11 +5,9 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { apiErrorMessage } from '../../core/http/api-error';
 import { NotificationService } from '../../core/notifications/notification.service';
+import { CONFIRM_DIALOG_SIZE, ConfirmDeleteData, ConfirmDeleteDialog } from '../../shared/confirm-delete-dialog';
 import { CategoryFormData, CategoryFormDialog } from './category-form-dialog';
 import { Category, CategoryService, CategoryType } from './category.service';
-import { ConfirmDeleteDialog } from './confirm-delete-dialog';
-
-const DIALOG_SIZE = { width: '440px', maxWidth: 'calc(100vw - 32px)' };
 
 const SECTIONS: { type: CategoryType; title: string; cssClass: string }[] = [
   { type: 'INCOME', title: 'Categorias de receitas', cssClass: 'income' },
@@ -204,7 +202,14 @@ export class Categories implements OnInit {
 
   protected openDelete(category: Category): void {
     this.dialog
-      .open<ConfirmDeleteDialog, Category, boolean>(ConfirmDeleteDialog, { ...DIALOG_SIZE, data: category })
+      .open<ConfirmDeleteDialog, ConfirmDeleteData, boolean>(ConfirmDeleteDialog, {
+        ...CONFIRM_DIALOG_SIZE,
+        data: {
+          title: 'Excluir categoria',
+          message: `Deseja excluir a categoria "${category.name}"? Esta ação não pode ser desfeita.`,
+          remove: () => this.service.remove(category.id),
+        },
+      })
       .afterClosed()
       .subscribe((deleted) => {
         if (deleted) {
@@ -216,7 +221,7 @@ export class Categories implements OnInit {
 
   private openForm(data: CategoryFormData): void {
     this.dialog
-      .open<CategoryFormDialog, CategoryFormData, Category>(CategoryFormDialog, { ...DIALOG_SIZE, data })
+      .open<CategoryFormDialog, CategoryFormData, Category>(CategoryFormDialog, { ...CONFIRM_DIALOG_SIZE, data })
       .afterClosed()
       .subscribe((saved) => {
         if (saved) {

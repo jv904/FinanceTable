@@ -1,20 +1,29 @@
 import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { Observable } from 'rxjs';
 
-import { apiErrorMessage } from '../../core/http/api-error';
-import { Category, CategoryService } from './category.service';
+import { apiErrorMessage } from '../core/http/api-error';
+
+export interface ConfirmDeleteData {
+  title: string;
+  message: string;
+  /** Faz a exclusão. Em caso de erro, o diálogo continua aberto e mostra a mensagem. */
+  remove: () => Observable<void>;
+}
+
+export const CONFIRM_DIALOG_SIZE = { width: '440px', maxWidth: 'calc(100vw - 32px)' };
 
 @Component({
   selector: 'app-confirm-delete-dialog',
   imports: [MatButtonModule, MatDialogModule],
   template: `
-    <h2 mat-dialog-title>Excluir categoria</h2>
+    <h2 mat-dialog-title>{{ data.title }}</h2>
     <mat-dialog-content>
       @if (errorMessage()) {
         <p class="ft-form-alert" role="alert">{{ errorMessage() }}</p>
       }
-      <p class="question">Deseja excluir a categoria "{{ category.name }}"? Esta ação não pode ser desfeita.</p>
+      <p class="question">{{ data.message }}</p>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button matButton type="button" mat-dialog-close>Cancelar</button>
@@ -35,10 +44,9 @@ import { Category, CategoryService } from './category.service';
   `,
 })
 export class ConfirmDeleteDialog {
-  private readonly categories = inject(CategoryService);
   private readonly dialog = inject<MatDialogRef<ConfirmDeleteDialog, boolean>>(MatDialogRef);
 
-  protected readonly category = inject<Category>(MAT_DIALOG_DATA);
+  protected readonly data = inject<ConfirmDeleteData>(MAT_DIALOG_DATA);
   protected readonly deleting = signal(false);
   protected readonly errorMessage = signal('');
 
@@ -46,7 +54,7 @@ export class ConfirmDeleteDialog {
     this.deleting.set(true);
     this.errorMessage.set('');
 
-    this.categories.remove(this.category.id).subscribe({
+    this.data.remove().subscribe({
       next: () => this.dialog.close(true),
       error: (error: unknown) => {
         this.errorMessage.set(apiErrorMessage(error));

@@ -18,6 +18,7 @@ public class CategoryService {
 
 	private static final String NAME_TAKEN = "Já existe uma categoria com este nome.";
 	private static final String NOT_FOUND = "Categoria não encontrada.";
+	private static final String IN_USE = "Esta categoria possui movimentações vinculadas.";
 	private static final Locale PT_BR = Locale.of("pt", "BR");
 
 	private final CategoryRepository categories;
@@ -44,18 +45,29 @@ public class CategoryService {
 
 	@Transactional
 	Category rename(UUID userId, UUID id, String name) {
-		Category category = find(userId, id);
+		Category category = findOwned(userId, id);
 		category.rename(name);
 		return saveCheckingName(category);
 	}
 
+	/** A chave estrangeira das movimentações decide se a categoria está em uso, inclusive em pedidos simultâneos. */
 	@Transactional
 	void delete(UUID userId, UUID id) {
-		categories.delete(find(userId, id));
+		Category category = findOwned(userId, id);
+		try {
+			categories.delete(category);
+			categories.flush();
+		}
+		catch (DataIntegrityViolationException ex) {
+			throw new ApiException(HttpStatus.CONFLICT, IN_USE);
+		}
 	}
 
-	/** Categoria de outra conta responde como inexistente, para não revelar que ela existe. */
-	private Category find(UUID userId, UUID id) {
+	/**
+	 * Categoria de outra conta responde como inexistente, para não revelar que ela existe. Deve ser chamado
+	 * dentro de uma transação.
+	 */
+	public Category findOwned(UUID userId, UUID id) {
 		return categories.findByIdAndUserId(id, userId)
 				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, NOT_FOUND));
 	}

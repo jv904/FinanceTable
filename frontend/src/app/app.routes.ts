@@ -43,7 +43,11 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'inicio' },
       comingSoon('inicio', 'Início', 'Aqui você verá seu saldo, gráficos, últimas movimentações e metas.'),
-      comingSoon('movimentacoes', 'Movimentações', 'Aqui você vai registrar e consultar suas receitas e despesas.'),
+      {
+        path: 'movimentacoes',
+        title: 'Movimentações · FinanceTable',
+        loadComponent: () => import('./features/transactions/transactions').then((m) => m.Transactions),
+      },
       {
         path: 'categorias',
         title: 'Categorias · FinanceTable',
