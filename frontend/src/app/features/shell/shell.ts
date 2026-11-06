@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { path: '/metas', label: 'Metas', icon: 'flag' },
   { path: '/relatorios', label: 'Relatórios', icon: 'bar_chart' },
   { path: '/perfil', label: 'Perfil', icon: 'person' },
+  { path: '/ajuda', label: 'Ajuda', icon: 'help' },
 ];
 
 @Component({

@@ -18,12 +18,25 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.security.web.savedrequest.NullRequestCache;
 
 import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 public class SecurityConfig {
+
+	/** O Angular Material usa estilos inline; as fontes vêm do Google, como está no index.html. */
+	private static final String CONTENT_SECURITY_POLICY = String.join("; ",
+			"default-src 'self'",
+			"script-src 'self'",
+			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+			"font-src 'self' https://fonts.gstatic.com",
+			"img-src 'self' data:",
+			"object-src 'none'",
+			"base-uri 'self'",
+			"form-action 'self'",
+			"frame-ancestors 'none'");
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityContextRepository contextRepository) {
@@ -38,7 +51,13 @@ public class SecurityConfig {
 								"/api/auth/forgot-password",
 								"/api/auth/reset-password")
 						.permitAll()
-						.anyRequest().authenticated())
+						.requestMatchers("/api/**").authenticated()
+						// Telas do Angular, que protegem as próprias rotas; os dados só saem por /api.
+						.anyRequest().permitAll())
+				.headers(headers -> headers
+						// O link de recuperação leva o token na URL: ele não pode vazar para outros sites.
+						.referrerPolicy(referrer -> referrer.policy(ReferrerPolicy.SAME_ORIGIN))
+						.contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY)))
 				.exceptionHandling(errors -> errors
 						.authenticationEntryPoint((request, response, ex) -> writeProblem(response,
 								HttpStatus.UNAUTHORIZED, "Faça login para continuar."))

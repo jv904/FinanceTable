@@ -1,4 +1,21 @@
+# Variáveis locais e segredos
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+
+# Logs e relatórios gerados
+*.log
+coverage/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
 .idea/
 .vscode/
 node_modules/

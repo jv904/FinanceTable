@@ -1,0 +1,10 @@
+.git
+.env
+.env.*
+.idea
+.vscode
+docs
+**/node_modules
+**/dist
+**/.angular
+**/target

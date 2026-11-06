@@ -63,6 +63,11 @@ export const routes: Routes = [
         title: 'Perfil · FinanceTable',
         loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),
       },
+      {
+        path: 'ajuda',
+        title: 'Ajuda · FinanceTable',
+        loadComponent: () => import('./features/help/help').then((m) => m.Help),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

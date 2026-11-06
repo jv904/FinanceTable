@@ -1,0 +1,12 @@
+# Soma-se ao application.yaml principal, com prioridade sobre ele, só durante os testes.
+# As suítes fazem muitos cadastros e logins a partir do mesmo endereço; quem testa os limites é
+# AttemptLimitIntegrationTest, com valores próprios.
+app:
+  limits:
+    login-account: { max: 100000, window: 1m }
+    login-ip: { max: 100000, window: 1m }
+    password-change: { max: 100000, window: 1m }
+    password-reset-ip: { max: 100000, window: 1m }
+    register-ip: { max: 100000, window: 1m }
+    forgot-email: { max: 100000, window: 1m }
+    forgot-ip: { max: 100000, window: 1m }

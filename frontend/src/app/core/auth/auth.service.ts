@@ -59,6 +59,16 @@ export class AuthService {
       );
   }
 
+  updateName(name: string): Observable<User> {
+    return this.http.patch<User>(`${API}/me`, { name }).pipe(tap((user) => this.currentUser.set(user)));
+  }
+
+  changePassword(currentPassword: string, password: string, confirmPassword: string): Observable<string> {
+    return this.http
+      .post<MessageResponse>(`${API}/change-password`, { currentPassword, password, confirmPassword })
+      .pipe(map((res) => res.message));
+  }
+
   /**
    * O logout apaga o cookie CSRF. A consulta seguinte traz um novo, para que o próximo login
    * não seja recusado.
