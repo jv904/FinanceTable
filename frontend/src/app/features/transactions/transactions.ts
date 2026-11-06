@@ -14,10 +14,9 @@ import { apiErrorMessage } from '../../core/http/api-error';
 import { NotificationService } from '../../core/notifications/notification.service';
 import { CONFIRM_DIALOG_SIZE, ConfirmDeleteData, ConfirmDeleteDialog } from '../../shared/confirm-delete-dialog';
 import { Category, CategoryService, CategoryType } from '../categories/category.service';
-import { TransactionFormData, TransactionFormDialog } from './transaction-form-dialog';
+import { TRANSACTION_DIALOG_SIZE, TransactionFormData, TransactionFormDialog } from './transaction-form-dialog';
 import { Transaction, TransactionFilters, TransactionPage, TransactionService } from './transaction.service';
 
-const FORM_DIALOG_SIZE = { width: '480px', maxWidth: 'calc(100vw - 32px)' };
 const INVERTED_PERIOD_MESSAGE = 'A data inicial não pode ser posterior à data final.';
 
 @Component({
@@ -371,7 +370,7 @@ export class Transactions implements OnInit {
   private openForm(data: TransactionFormData): void {
     this.dialog
       .open<TransactionFormDialog, TransactionFormData, Transaction>(TransactionFormDialog, {
-        ...FORM_DIALOG_SIZE,
+        ...TRANSACTION_DIALOG_SIZE,
         data,
       })
       .afterClosed()

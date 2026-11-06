@@ -21,7 +21,7 @@ import com.financetable.backend.transaction.dto.TransactionResponse;
 class TransactionService {
 
 	private static final int MAX_PAGE_SIZE = 100;
-	private static final Sort NEWEST_FIRST = Sort.<Transaction>by(Sort.Direction.DESC, Transaction::getOccurredOn,
+	static final Sort NEWEST_FIRST = Sort.<Transaction>by(Sort.Direction.DESC, Transaction::getOccurredOn,
 			Transaction::getCreatedAt, Transaction::getId);
 
 	private final TransactionRepository transactions;

@@ -23,6 +23,8 @@ export interface TransactionFormData {
   transaction?: Transaction;
 }
 
+export const TRANSACTION_DIALOG_SIZE = { width: '480px', maxWidth: 'calc(100vw - 32px)' };
+
 const REQUIRED_MESSAGE = 'Preencha todos os campos obrigatórios.';
 const SAVE_FAILED_MESSAGE = 'Não foi possível salvar. Tente novamente.';
 
@@ -71,8 +73,7 @@ function validAmount(control: AbstractControl<string>): ValidationErrors | null 
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Valor</mat-label>
-          <span matTextPrefix>R$&nbsp;</span>
+          <mat-label>Valor (R$)</mat-label>
           <input matInput formControlName="amount" inputmode="decimal" autocomplete="off" />
           <mat-error>{{ amountError() }}</mat-error>
         </mat-form-field>
@@ -152,7 +153,10 @@ export class TransactionFormDialog {
     type: [this.data.type, Validators.required],
     // O padrão recusa uma descrição feita só de espaços, que o "required" aceitaria.
     description: [this.data.transaction?.description ?? '', [Validators.required, Validators.pattern(/\S/)]],
-    amount: [this.data.transaction ? formatAmount(this.data.transaction.amount) : '', validAmount],
+    amount: [
+      this.data.transaction ? formatAmount(this.data.transaction.amount) : '',
+      [Validators.required, validAmount],
+    ],
     categoryId: [this.data.transaction?.categoryId ?? '', Validators.required],
     occurredOn: [this.data.transaction?.occurredOn ?? today(), Validators.required],
   });

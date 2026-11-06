@@ -42,7 +42,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/shell/shell').then((m) => m.Shell),
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'inicio' },
-      comingSoon('inicio', 'Início', 'Aqui você verá seu saldo, gráficos, últimas movimentações e metas.'),
+      {
+        path: 'inicio',
+        title: 'Início · FinanceTable',
+        loadComponent: () => import('./features/home/home').then((m) => m.Home),
+      },
       {
         path: 'movimentacoes',
         title: 'Movimentações · FinanceTable',
