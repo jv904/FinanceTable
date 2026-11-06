@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -86,5 +87,9 @@ interface TransactionRepository extends JpaRepository<Transaction, UUID>, JpaSpe
 	@Override
 	@EntityGraph(attributePaths = "category")
 	Page<Transaction> findAll(Specification<Transaction> specification, Pageable pageable);
+
+	@Override
+	@EntityGraph(attributePaths = "category")
+	List<Transaction> findAll(Specification<Transaction> specification, Sort sort);
 
 }

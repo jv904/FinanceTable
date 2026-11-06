@@ -47,6 +47,17 @@ describe('ComparisonBars', () => {
     expect(text(element)).toContain('Nenhuma movimentação neste mês.');
     expect(element.querySelector('.bar')).toBeNull();
   });
+
+  it('aceita outro aviso, para períodos que não são um mês', async () => {
+    setup();
+    const fixture = TestBed.createComponent(ComparisonBars);
+    fixture.componentRef.setInput('income', 0);
+    fixture.componentRef.setInput('expense', 0);
+    fixture.componentRef.setInput('emptyMessage', 'Nenhuma movimentação neste período.');
+    await fixture.whenStable();
+
+    expect(text(fixture.nativeElement)).toContain('Nenhuma movimentação neste período.');
+  });
 });
 
 describe('CategoryBars', () => {
@@ -75,6 +86,16 @@ describe('CategoryBars', () => {
     await fixture.whenStable();
 
     expect(text(fixture.nativeElement)).toContain('Nenhuma despesa neste mês.');
+  });
+
+  it('aceita outro aviso, para períodos que não são um mês', async () => {
+    setup();
+    const fixture = TestBed.createComponent(CategoryBars);
+    fixture.componentRef.setInput('categories', []);
+    fixture.componentRef.setInput('emptyMessage', 'Nenhuma despesa neste período.');
+    await fixture.whenStable();
+
+    expect(text(fixture.nativeElement)).toContain('Nenhuma despesa neste período.');
   });
 
   it('uma fatia muito pequena não aparece como zero', () => {
@@ -187,5 +208,28 @@ describe('ExpenseTrend', () => {
 
     expect(text(element)).toContain('Nenhuma despesa nos últimos 6 meses.');
     expect(element.querySelector('svg')).toBeNull();
+  });
+
+  it('esconde a própria tabela quando a tela já mostra os valores em outra', async () => {
+    setup();
+    fixture = TestBed.createComponent(ExpenseTrend);
+    fixture.componentRef.setInput('months', MONTHS);
+    fixture.componentRef.setInput('selected', '2027-03');
+    fixture.componentRef.setInput('showTable', false);
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('details')).toBeNull();
+    expect(fixture.nativeElement.querySelector('svg')).not.toBeNull();
+  });
+
+  it('aceita outro aviso, para períodos que não são de 6 meses', async () => {
+    setup();
+    fixture = TestBed.createComponent(ExpenseTrend);
+    fixture.componentRef.setInput('months', [{ month: '2026-10', amount: 0 }]);
+    fixture.componentRef.setInput('selected', '2026-10');
+    fixture.componentRef.setInput('emptyMessage', 'Nenhuma despesa neste período.');
+    await fixture.whenStable();
+
+    expect(text(fixture.nativeElement)).toContain('Nenhuma despesa neste período.');
   });
 });

@@ -22,7 +22,7 @@ import { Component, computed, input } from '@angular/core';
         <div class="bar expense" [style.width.%]="(expense() / scale()) * 100"></div>
       </div>
     } @else {
-      <p class="empty">Nenhuma movimentação neste mês.</p>
+      <p class="empty">{{ emptyMessage() }}</p>
     }
   `,
   styles: `
@@ -68,6 +68,7 @@ import { Component, computed, input } from '@angular/core';
 export class ComparisonBars {
   readonly income = input.required<number>();
   readonly expense = input.required<number>();
+  readonly emptyMessage = input('Nenhuma movimentação neste mês.');
 
   protected readonly scale = computed(() => Math.max(this.income(), this.expense()));
 }

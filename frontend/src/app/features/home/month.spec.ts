@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-import { currentMonth, monthShort, monthTitle, shiftMonth } from './month';
+import { currentMonth, firstDay, lastDay, lastMonths, monthShort, monthTitle, shiftMonth } from './month';
 
 describe('month', () => {
   it('usa o fuso local para o mês atual, mesmo na última noite do mês', () => {
@@ -19,6 +19,21 @@ describe('month', () => {
     ['2026-03', 0, '2026-03'],
   ])('%s deslocado em %d vira %s', (month, delta, expected) => {
     expect(shiftMonth(month, delta)).toBe(expected);
+  });
+
+  it.each([
+    ['2026-01', '2026-01-31'],
+    ['2026-02', '2026-02-28'],
+    ['2028-02', '2028-02-29'],
+    ['2026-11', '2026-11-30'],
+    ['2026-12', '2026-12-31'],
+  ])('%s vai do dia 1 até %s', (month, last) => {
+    expect(firstDay(month)).toBe(`${month}-01`);
+    expect(lastDay(month)).toBe(last);
+  });
+
+  it('lista os últimos meses a partir do informado, atravessando o ano', () => {
+    expect(lastMonths('2027-01', 3)).toEqual(['2027-01', '2026-12', '2026-11']);
   });
 
   it('escreve em português', () => {

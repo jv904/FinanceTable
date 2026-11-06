@@ -79,13 +79,13 @@ class SummaryService {
 				.getContent();
 	}
 
-	private static Map<CategoryType, BigDecimal> byType(List<TypeTotal> rows) {
+	static Map<CategoryType, BigDecimal> byType(List<TypeTotal> rows) {
 		Map<CategoryType, BigDecimal> totals = new HashMap<>();
 		rows.forEach(row -> totals.put(row.getType(), row.getTotal()));
 		return totals;
 	}
 
-	private static BigDecimal total(Map<CategoryType, BigDecimal> totals, CategoryType type) {
+	static BigDecimal total(Map<CategoryType, BigDecimal> totals, CategoryType type) {
 		return totals.getOrDefault(type, BigDecimal.ZERO);
 	}
 

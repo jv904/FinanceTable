@@ -30,7 +30,7 @@ export function shareText(amount: number, total: number): string {
         }
       </ul>
     } @else {
-      <p class="empty">Nenhuma despesa neste mês.</p>
+      <p class="empty">{{ emptyMessage() }}</p>
     }
   `,
   styles: `
@@ -94,6 +94,7 @@ export function shareText(amount: number, total: number): string {
 })
 export class CategoryBars {
   readonly categories = input.required<CategoryAmount[]>();
+  readonly emptyMessage = input('Nenhuma despesa neste mês.');
 
   protected readonly rows = computed(() => {
     const categories = this.categories();

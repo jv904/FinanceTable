@@ -19,6 +19,23 @@ export function shiftMonth(month: string, delta: number): string {
   return toMonth(date);
 }
 
+/** Primeiro dia do mês, no formato AAAA-MM-DD. */
+export function firstDay(month: string): string {
+  return `${month}-01`;
+}
+
+/** Último dia do mês, no formato AAAA-MM-DD. */
+export function lastDay(month: string): string {
+  const date = toDate(month);
+  const day = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  return `${month}-${String(day).padStart(2, '0')}`;
+}
+
+/** Os últimos meses até o informado, do mais recente para o mais antigo. */
+export function lastMonths(month: string, count: number): string[] {
+  return Array.from({ length: count }, (_, index) => shiftMonth(month, -index));
+}
+
 /** "novembro de 2026" */
 export function monthTitle(month: string): string {
   return toDate(month).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });

@@ -2,15 +2,6 @@ import { Routes } from '@angular/router';
 
 import { authGuard, guestGuard } from './core/auth/auth.guards';
 
-function comingSoon(path: string, title: string, description: string) {
-  return {
-    path,
-    title: `${title} · FinanceTable`,
-    data: { heading: title, description },
-    loadComponent: () => import('./features/coming-soon/coming-soon').then((m) => m.ComingSoon),
-  };
-}
-
 export const routes: Routes = [
   {
     path: 'entrar',
@@ -62,7 +53,11 @@ export const routes: Routes = [
         title: 'Metas · FinanceTable',
         loadComponent: () => import('./features/goals/goals').then((m) => m.Goals),
       },
-      comingSoon('relatorios', 'Relatórios', 'Aqui você vai analisar suas finanças por período e comparar meses.'),
+      {
+        path: 'relatorios',
+        title: 'Relatórios · FinanceTable',
+        loadComponent: () => import('./features/reports/reports').then((m) => m.Reports),
+      },
       {
         path: 'perfil',
         title: 'Perfil · FinanceTable',

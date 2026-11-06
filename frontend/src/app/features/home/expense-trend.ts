@@ -87,27 +87,29 @@ const AXIS_FORMAT = new Intl.NumberFormat('pt-BR', {
         }
       </div>
 
-      <details>
-        <summary>Ver como tabela</summary>
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Mês</th>
-              <th scope="col" class="amount">Despesas</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (point of points(); track point.month) {
+      @if (showTable()) {
+        <details>
+          <summary>Ver como tabela</summary>
+          <table>
+            <thead>
               <tr>
-                <td>{{ point.title }}</td>
-                <td class="amount">{{ point.amount | currency: 'BRL' }}</td>
+                <th scope="col">Mês</th>
+                <th scope="col" class="amount">Despesas</th>
               </tr>
-            }
-          </tbody>
-        </table>
-      </details>
+            </thead>
+            <tbody>
+              @for (point of points(); track point.month) {
+                <tr>
+                  <td>{{ point.title }}</td>
+                  <td class="amount">{{ point.amount | currency: 'BRL' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </details>
+      }
     } @else {
-      <p class="empty">Nenhuma despesa nos últimos 6 meses.</p>
+      <p class="empty">{{ emptyMessage() }}</p>
     }
   `,
   styles: `
@@ -242,6 +244,9 @@ export class ExpenseTrend {
   readonly months = input.required<MonthAmount[]>();
   /** Mês em destaque, no formato AAAA-MM. */
   readonly selected = input.required<string>();
+  readonly emptyMessage = input('Nenhuma despesa nos últimos 6 meses.');
+  /** Desligue quando a tela já mostrar estes valores em outra tabela. */
+  readonly showTable = input(true);
 
   protected readonly height = HEIGHT;
   protected readonly top = MARGIN.top;
